@@ -12,6 +12,7 @@ func main() {
 	encryptionHandler := encryption.EncryptionHandler{}
 	router.Handle("POST", "/api/auth", encryptionHandler.Authenticate)
 	router.Handle("POST", "/api/decrypt", encryptionHandler.Decrypt)
+	router.Handle("POST", "/api/login", encryptionHandler.Login)
 
 	logrus.Fatal(router.Run("0.0.0.0:8080"))
 }

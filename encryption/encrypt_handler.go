@@ -4,6 +4,8 @@ import (
 	"encoding/json"
 	"io/ioutil"
 
+	"github.com/dgrijalva/jwt-go"
+
 	"github.com/gin-gonic/gin"
 	"github.com/sirupsen/logrus"
 	"golang.org/x/crypto/bcrypt"
@@ -62,6 +64,27 @@ func (e EncryptionHandler) Decrypt(c *gin.Context) {
 	}
 
 	c.JSON(200, gin.H{"message": "salted password matched unencrypted"})
+}
+
+func (e EncryptionHandler) Login(c *gin.Context) {
+	user := Auth{
+		Username: "Renju",
+		Password: "testuser123",
+	}
+
+	token := jwt.New(jwt.SigningMethodHS512)
+	claims := token.Claims.(jwt.MapClaims)
+	claims["admin"] = true
+	claims["name"] = user.Username
+
+	tokenString, err := token.SignedString([]byte("my-signing-key"))
+	if err != nil {
+		logrus.Errorf("unable to sign token %v", err)
+	}
+
+	c.JSON(200, gin.H{
+		"token": tokenString,
+	})
 }
 
 type Auth struct {
