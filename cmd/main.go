@@ -12,18 +12,41 @@ import (
 func main() {
 	router := gin.Default()
 	router.Handle("POST", "/api/auth", authenticate)
+	router.Handle("POST", "/api/decrypt", decrypt)
 
 	logrus.Fatal(router.Run("0.0.0.0:8080"))
 }
 
 func decrypt(c *gin.Context) {
+	body, err := ioutil.ReadAll(c.Request.Body)
+	if err != nil {
+		c.JSON(500, err)
+		return
+	}
 
+	logrus.Infof("body %v", string(body))
+	var auth Auth
+	err = json.Unmarshal(body, &auth)
+	if err != nil {
+		logrus.Errorf("unable to unmarshal json %v", err)
+		c.JSON(500, err)
+		return
+	}
+
+	err = bcrypt.CompareHashAndPassword([]byte(auth.SaltedPassword), []byte(auth.Password))
+	if err != nil {
+		c.JSON(403, err)
+		return
+	}
+
+	c.JSON(200, gin.H{"message": "salted password matched unencrypted"})
 }
 
 func authenticate(c *gin.Context) {
 	body, err := ioutil.ReadAll(c.Request.Body)
 	if err != nil {
-		logrus.Errorf("unable to read body %v", err)
+		c.JSON(500, err)
+		return
 	}
 
 	logrus.Infof("body %v", string(body))
@@ -48,8 +71,9 @@ func authenticate(c *gin.Context) {
 }
 
 type Auth struct {
-	Username string `json:"username"`
-	Password string `json:"password"`
+	Username       string `json:"username"`
+	Password       string `json:"password"`
+	SaltedPassword string `json:"saltedPassword"`
 }
 
 type AuthRepsonse struct {
