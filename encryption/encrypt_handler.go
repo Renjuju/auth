@@ -4,6 +4,8 @@ import (
 	"encoding/json"
 	"io/ioutil"
 
+	"github.com/renjuju/hello/models"
+
 	"github.com/renjuju/hello/dao"
 
 	"github.com/dgrijalva/jwt-go"
@@ -26,7 +28,7 @@ func (e EncryptionHandler) GenerateSaltedPassword(c *gin.Context) {
 	}
 
 	logrus.Infof("body %v", string(body))
-	var auth Auth
+	var auth models.Auth
 	err = json.Unmarshal(body, &auth)
 	if err != nil {
 		logrus.Errorf("unable to unmarshal json %v", err)
@@ -43,7 +45,7 @@ func (e EncryptionHandler) GenerateSaltedPassword(c *gin.Context) {
 		return
 	}
 
-	c.JSON(200, AuthRepsonse{Hash: string(ePass)})
+	c.JSON(200, models.AuthRepsonse{Hash: string(ePass)})
 }
 
 // Compares salted password & password
@@ -55,7 +57,7 @@ func (e EncryptionHandler) PasswordCompare(c *gin.Context) {
 	}
 
 	logrus.Infof("body %v", string(body))
-	var auth Auth
+	var auth models.Auth
 	err = json.Unmarshal(body, &auth)
 	if err != nil {
 		logrus.Errorf("unable to unmarshal json %v", err)
@@ -81,7 +83,7 @@ func (e EncryptionHandler) Login(c *gin.Context) {
 		return
 	}
 
-	var auth Auth
+	var auth models.Auth
 	err = json.Unmarshal(data, auth)
 	if err != nil {
 		logrus.Errorf("unable to unmarshal to auth struct: %v", err)
@@ -107,14 +109,4 @@ func (e EncryptionHandler) Login(c *gin.Context) {
 	c.JSON(200, gin.H{
 		"token": tokenString,
 	})
-}
-
-type Auth struct {
-	Username       string `json:"username"`
-	Password       string `json:"password"`
-	SaltedPassword string `json:"saltedPassword"`
-}
-
-type AuthRepsonse struct {
-	Hash string
 }

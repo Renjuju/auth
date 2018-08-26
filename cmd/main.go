@@ -4,14 +4,15 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/renjuju/hello/dao"
 	"github.com/renjuju/hello/encryption"
+	"github.com/renjuju/hello/models"
 	"github.com/sirupsen/logrus"
 )
 
 func main() {
 	router := gin.Default()
 
-	userMap := make(map[string]dao.User)
-	userMap["testuser"] = dao.User{
+	userMap := make(map[string]models.User)
+	userMap["testuser"] = models.User{
 		SaltedPassword: "saltedPassword",
 		Username:       "testuser",
 	}
