@@ -4,6 +4,8 @@ import (
 	"encoding/json"
 	"io/ioutil"
 
+	"github.com/renjuju/hello/dao"
+
 	"github.com/dgrijalva/jwt-go"
 
 	"github.com/gin-gonic/gin"
@@ -11,9 +13,12 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
-type EncryptionHandler struct{}
+type EncryptionHandler struct {
+	UserDao dao.UserDao
+}
 
-func (e EncryptionHandler) Authenticate(c *gin.Context) {
+// GenerateSaltedPassword generates a salted password
+func (e EncryptionHandler) GenerateSaltedPassword(c *gin.Context) {
 	body, err := ioutil.ReadAll(c.Request.Body)
 	if err != nil {
 		c.JSON(500, err)
@@ -41,7 +46,8 @@ func (e EncryptionHandler) Authenticate(c *gin.Context) {
 	c.JSON(200, AuthRepsonse{Hash: string(ePass)})
 }
 
-func (e EncryptionHandler) Decrypt(c *gin.Context) {
+// Compares salted password & password
+func (e EncryptionHandler) PasswordCompare(c *gin.Context) {
 	body, err := ioutil.ReadAll(c.Request.Body)
 	if err != nil {
 		c.JSON(500, err)
@@ -66,16 +72,32 @@ func (e EncryptionHandler) Decrypt(c *gin.Context) {
 	c.JSON(200, gin.H{"message": "salted password matched unencrypted"})
 }
 
+// Login fakes a user login
 func (e EncryptionHandler) Login(c *gin.Context) {
-	user := Auth{
-		Username: "Renju",
-		Password: "testuser123",
+	data, err := ioutil.ReadAll(c.Request.Body)
+	if err != nil {
+		logrus.Errorf("unable to read request body %v", err)
+		c.Status(401)
+		return
+	}
+
+	var auth Auth
+	err = json.Unmarshal(data, auth)
+	if err != nil {
+		logrus.Errorf("unable to unmarshal to auth struct: %v", err)
+		c.Status(401)
+		return
+	}
+
+	user, err := e.UserDao.GetUser(auth.Username, auth.Password)
+	if err != nil {
+		logrus.Errorf("unable to get user %v", err)
+		return
 	}
 
 	token := jwt.New(jwt.SigningMethodHS512)
 	claims := token.Claims.(jwt.MapClaims)
-	claims["admin"] = true
-	claims["name"] = user.Username
+	claims["data"] = user.Username
 
 	tokenString, err := token.SignedString([]byte("my-signing-key"))
 	if err != nil {
