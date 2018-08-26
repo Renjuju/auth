@@ -2,9 +2,9 @@ package main
 
 import (
 	"github.com/gin-gonic/gin"
-	"github.com/renjuju/hello/dao"
-	"github.com/renjuju/hello/encryption"
-	"github.com/renjuju/hello/models"
+	"github.com/renjuju/auth/dao"
+	"github.com/renjuju/auth/encryption"
+	"github.com/renjuju/auth/models"
 	"github.com/sirupsen/logrus"
 )
 
