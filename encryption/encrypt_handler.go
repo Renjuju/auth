@@ -4,13 +4,10 @@ import (
 	"encoding/json"
 	"io/ioutil"
 
-	"github.com/renjuju/hello/models"
-
-	"github.com/renjuju/hello/dao"
-
 	"github.com/dgrijalva/jwt-go"
-
 	"github.com/gin-gonic/gin"
+	"github.com/renjuju/auth/dao"
+	"github.com/renjuju/auth/models"
 	"github.com/sirupsen/logrus"
 	"golang.org/x/crypto/bcrypt"
 )

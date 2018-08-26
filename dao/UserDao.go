@@ -3,8 +3,7 @@ package dao
 import (
 	"errors"
 
-	"github.com/renjuju/hello/models"
-
+	"github.com/renjuju/auth/models"
 	"golang.org/x/crypto/bcrypt"
 )
 
