@@ -9,8 +9,7 @@ import (
 )
 
 type UserDao struct {
-	UserData map[string]models.User
-	Db       *sql.DB
+	Db *sql.DB
 }
 
 func (u UserDao) GetUser(userId, password string) (models.User, error) {

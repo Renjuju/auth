@@ -8,7 +8,6 @@ import (
 	_ "github.com/lib/pq"
 	"github.com/renjuju/auth/dao"
 	"github.com/renjuju/auth/encryption"
-	"github.com/renjuju/auth/models"
 	"github.com/sirupsen/logrus"
 )
 
@@ -28,15 +27,8 @@ func main() {
 	router.Use(middleware.Logger())
 	router.Use(middleware.Recover())
 
-	userMap := make(map[string]models.User)
-	userMap["testuser"] = models.User{
-		SaltedPassword: "saltedPassword",
-		Username:       "testuser",
-	}
-
 	userDao := dao.UserDao{
-		UserData: userMap,
-		Db:       db,
+		Db: db,
 	}
 
 	encryptionHandler := encryption.EncryptionHandler{UserDao: userDao}
