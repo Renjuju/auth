@@ -18,6 +18,12 @@ type User struct {
 }
 
 func main() {
+	connStr := "user=postgres dbname=profile sslmode=disable"
+	db, err := sql.Open("postgres", connStr)
+	if err != nil {
+		logrus.Fatalf("unable to open sql connection %v", err)
+	}
+
 	router := echo.New()
 	router.Use(middleware.Logger())
 	router.Use(middleware.Recover())
@@ -30,6 +36,7 @@ func main() {
 
 	userDao := dao.UserDao{
 		UserData: userMap,
+		Db:       db,
 	}
 
 	encryptionHandler := encryption.EncryptionHandler{UserDao: userDao}
@@ -39,28 +46,4 @@ func main() {
 	router.POST("/api/login", encryptionHandler.Login)
 
 	router.Logger.Fatal(router.Start(":8080"))
-}
-
-func exampleSql() {
-	connStr := "user=postgres dbname=profile sslmode=disable"
-	db, err := sql.Open("postgres", connStr)
-	if err != nil {
-		logrus.Fatalf("unable to open sql connection %v", err)
-	}
-
-	rows, err := db.Query("SELECT * FROM users")
-	if err != nil {
-		logrus.Fatalf("unable to query db %v", err)
-	}
-
-	for rows.Next() {
-		var user User
-		err := rows.Scan(&user.Username, &user.Password)
-
-		if err != nil {
-			logrus.Fatalf("unable to query columns %v", err)
-		}
-
-		logrus.Infof("user data %v", user)
-	}
 }

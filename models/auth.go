@@ -14,6 +14,6 @@ type AuthRepsonse struct {
 
 // User data
 type User struct {
-	SaltedPassword string
 	Username       string
+	SaltedPassword string
 }

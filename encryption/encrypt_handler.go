@@ -80,7 +80,7 @@ func (e EncryptionHandler) Login(c echo.Context) error {
 	}
 
 	var auth models.Auth
-	err = json.Unmarshal(data, auth)
+	err = json.Unmarshal(data, &auth)
 	if err != nil {
 		logrus.Errorf("unable to unmarshal to auth struct: %v", err)
 		return err
@@ -88,6 +88,7 @@ func (e EncryptionHandler) Login(c echo.Context) error {
 
 	user, err := e.UserDao.GetUser(auth.Username, auth.Password)
 	if err != nil {
+		logrus.Infof("error %v", err)
 		return err
 	}
 
