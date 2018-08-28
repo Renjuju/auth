@@ -2,9 +2,8 @@ package models
 
 // Auth datastructure
 type Auth struct {
-	Username       string `json:"username"`
-	Password       string `json:"password"`
-	SaltedPassword string `json:"saltedPassword"`
+	User
+	Password string `json:"password"`
 }
 
 // AuthResponse
